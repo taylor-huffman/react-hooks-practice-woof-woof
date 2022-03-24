@@ -1,16 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import DogInfo from "./DogInfo";
+import DogBar from "./DogBar";
+import Filter from "./Filter";
+
+const API = 'http://localhost:3001/pups'
 
 function App() {
+
+  const [dogs, setDogs] = useState([])
+  const [dogDetails, setDogDetails] = useState([])
+  const [filter, setFilter] = useState(false)
+
+  useEffect(() => {
+    fetch(API)
+    .then(r => r.json())
+    .then(dogs => {
+      setDogs(dogs)
+      setDogDetails(dogs[0])
+    })
+  }, [])
+
+  const displayDogs = dogs.filter(dog => {
+    if (filter === false) return true
+    return dog.isGoodDog === true
+  })
+
   return (
     <div className="App">
-      <div id="filter-div">
-        <button id="good-dog-filter">Filter good dogs: OFF</button>
-      </div>
-      <div id="dog-bar"></div>
-      <div id="dog-summary-container">
-        <h1>DOGGO:</h1>
-        <div id="dog-info"></div>
-      </div>
+      <Filter filter={filter} setFilter={setFilter} />
+      <DogBar dogs={displayDogs} setDogDetails={setDogDetails} />
+      <DogInfo dogDetails={dogDetails} setDogDetails={setDogDetails} API={API} dogs={dogs} setDogs={setDogs} />
     </div>
   );
 }
